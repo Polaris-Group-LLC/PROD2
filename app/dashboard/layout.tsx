@@ -25,24 +25,25 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    return redirect("/login");
+  }
+
   // check user plan in db
   const checkUserInDB = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, user!.email!));
-  if (checkUserInDB[0].plan === "none") {
+    .where(eq(usersTable.email, user.email));
+
+  if (!checkUserInDB.length || checkUserInDB[0].plan === "none") {
     console.log("User has no plan selected");
     return redirect("/subscribe");
   }
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
-          <DashboardHeader />
-          {children}
-        </div>
-      </body>
-    </html>
+    <div className="min-h-screen flex flex-col">
+      <DashboardHeader />
+      {children}
+    </div>
   );
 }
