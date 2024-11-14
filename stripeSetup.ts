@@ -64,8 +64,12 @@ async function createProducts() {
       });
 
       console.log(`Created ${plan.name} with price ${price.id}`);
-    } catch (error) {
-      console.error(`Error creating ${plan.name}:`, error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(`Error creating ${plan.name}:`, error.message);
+      } else {
+        console.error(`Error creating ${plan.name}:`, String(error));
+      }
     }
   }
 }

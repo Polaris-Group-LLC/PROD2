@@ -29,6 +29,10 @@ export default async function DashboardLayout({
     return redirect("/login");
   }
 
+  if (!user?.email) {
+    return redirect("/login");
+  }
+
   // check user plan in db
   const checkUserInDB = await db
     .select()
