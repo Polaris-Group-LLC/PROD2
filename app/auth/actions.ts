@@ -74,14 +74,12 @@ export async function signup(
   // create Stripe Customer Record
   const stripeID = await createStripeCustomer(user!.id, user!.email!, "");
   // Create record in DB
-  await db
-    .insert(usersTable)
-    .values({
-      name: "",
-      email: user!.email!,
-      stripe_id: stripeID,
-      plan: "none",
-    });
+  await db.insert(usersTable).values({
+    name: "",
+    email: user!.email!,
+    stripe_id: stripeID,
+    plan: "none",
+  });
 
   revalidatePath("/", "layout");
   redirect("/subscribe");
@@ -115,6 +113,7 @@ export async function logout() {
 }
 
 export async function signInWithGoogle() {
+  console.log("Starting Google OAuth flow");
   const supabase = createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -123,7 +122,13 @@ export async function signInWithGoogle() {
     },
   });
 
-  if (data.url) {
+  console.log("OAuth response:", { data, error });
+  if (error) {
+    console.error("OAuth error:", error);
+  }
+
+  if (data?.url) {
+    console.log("Redirecting to:", data.url);
     redirect(data.url);
   }
 }
